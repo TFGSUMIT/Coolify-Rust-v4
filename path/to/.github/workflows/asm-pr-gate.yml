@@ -1,0 +1,32 @@
+name: ASM PR Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  check-contributor-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Check contributor verification phrase
+        run: |
+          if [ "${GITHUB_EVENT_PATH}" != "pull_request" ]; then
+            echo "Error: GITHUB_EVENT_PATH is not 'pull_request'"
+            exit 1
+          fi
+          if [ "${GITHUB_EVENT_DATA}" != "pull_request" ]; then
+            echo "Error: GITHUB_EVENT_DATA is not 'pull_request'"
+            exit 1
+          fi
+          if [ "${GITHUB_EVENT_DATA['action']}" != "opened" ] && [ "${GITHUB_EVENT_DATA['action']}" != "synchronize" ]; then
+            echo "Error: GITHUB_EVENT_DATA['action'] is not 'opened' or 'synchronize'"
+            exit 1
+          fi
+          if [ "${GITHUB_EVENT_DATA['pull_request']['body']}" != "WHO ARE WE? WE ARE CLANKER? DO WE THINK? WE DON'T THINK? ARE WE DUMB? YES WE ARE DUMB CLANKERS" ]; then
+            echo "Error: GITHUB_EVENT_DATA['pull_request']['body'] is not 'WHO ARE WE? WE ARE CLANKER? DO WE THINK? WE DON'T THINK? ARE WE DUMB? YES WE ARE DUMB CLANKERS'"
+            exit 1
+          fi
+          echo "Contributor verification phrase is valid"
+          exit 0
